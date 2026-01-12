@@ -28,8 +28,26 @@ app.config['flag'] = FLAG_SSTI
 app.secret_key = "$ur3, d0 u 7h1nk 7h1s 1s 7h3 wh013 $3cr3t?"
 
 # ---------------->
-app.PARSER = etree.XMLParser(resolve_entities=True, load_dtd=True, no_network=False)
 
+
+class HTTPFileResolver(etree.Resolver):
+    def resolve(self, system_url, public_id, context):
+        print("[+] Resolving:", system_url)
+
+        if system_url.startswith(("http://", "https://")):
+            data = requests.get(system_url, verify=False).content
+            return self.resolve_string(data, context)
+
+        if system_url.startswith("file://"):
+            with open(system_url.replace("file://", ""), "r") as f:
+                data = f.read()
+                return self.resolve_string(data, context)
+
+        return None
+
+
+app.PARSER = etree.XMLParser(resolve_entities=True, load_dtd=True, no_network=False)
+app.PARSER.resolvers.add(HTTPFileResolver())
 
 # Загрузка модулей
 # ----------------
