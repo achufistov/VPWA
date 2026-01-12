@@ -7,7 +7,7 @@ from utils import *
 
 def refresh_token(jwt_token, ref_token, user_id):
     jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms="HS256")
-    if jwt_token['refresh_token'] == ref_token and jwt_token['user_id'] == user_id:
+    if jwt_token['refresh_token'] == ref_token and str(jwt_token['user_id']) == user_id:
         conn, cursor = settings.connect_to_db()
         payload = generate_token(user_id, jwt_token['username'])
         new_session = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
