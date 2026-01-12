@@ -24,4 +24,4 @@ def search_posts(column, value) -> tuple:
 
     except Exception as err:
         print(f"[?] {err}")
-        return data
+        return data, ""
