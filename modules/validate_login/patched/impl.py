@@ -7,7 +7,7 @@ from utils import *
 
 def validate_login(login: str, password: str) -> tuple:
     if not is_login(login):
-        return 0, 'Некорректный логин пользователя'
+        return 0, None, 'Некорректный логин пользователя'
     conn, cursor = settings.connect_to_db()
     query = f'SELECT id FROM users WHERE password=? and username=?'
     result = cursor.execute(query, (login.lower(), settings.hashlib.md5(password.encode()).hexdigest(), )).fetchone()
