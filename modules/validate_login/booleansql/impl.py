@@ -1,3 +1,4 @@
+import settings
 from utils import *
 
 '''
@@ -14,7 +15,7 @@ def validate_login(login: str, password: str) -> tuple:
     except Exception as err:
         return 0, None, 'Что-то пошло не так...'
     if result:
-        if result[0] == settings.SUPPORT_ID:
+        if result[0] == settings.SUPPORT_ID and password != settings.support_choice:
             return 0, None, 'Support так просто не сдаётся!'
         payload = generate_token(result[0], login)
         new_session = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
