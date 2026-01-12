@@ -21,11 +21,17 @@ FLAG_SSRF = "FLAG{1n73rn4l_$3rv3r_1$n7_1n73rn4l?}"
 UNIQ_ID = random.sample(range(100000, 999999), 5)
 SUPPORT_LIST_PASS = ["takecare", "suzana", "summer69", "summer12", "summer01",
                      "shanty", "shaney", "sasha123", "sammyboy", "reymond"]
+support_pass = random.choice(SUPPORT_LIST_PASS)
 ADMIN_ID = UNIQ_ID[0]
 ADMIN_PASS = hashlib.md5("$up3rm3g4d1ff1cul7p@$$w0rd@#__?.<#".encode()).hexdigest()
 SUPPORT_ID = UNIQ_ID[1]
-SUPPORT_PASS = hashlib.md5(random.choice(SUPPORT_LIST_PASS).encode()).hexdigest()
+SUPPORT_PASS = hashlib.md5(support_pass.encode()).hexdigest()
 
 # Name files
 PT_FILE = hashlib.md5(str(random.randbytes(4)).encode()).hexdigest()
 XXE_FILE = hashlib.md5(str(random.randbytes(4)).encode()).hexdigest()
+
+# Debug Info
+print(f"Admin ID: {ADMIN_ID}, Support ID: {SUPPORT_ID}, Other: {UNIQ_ID[2]}, {UNIQ_ID[3]}, {UNIQ_ID[4]}")
+print(f"Support Password: {support_pass}")
+print(f"Files: {PT_FILE} | {XXE_FILE}")
