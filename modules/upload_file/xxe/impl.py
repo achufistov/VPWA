@@ -5,12 +5,12 @@ from utils import *
 '''
 
 
-def upload_file(file, info_post: dict) -> bool:
+def upload_file(file, info_post: dict) -> tuple:
     if not is_valid_mimetype(file.mimetype):
-        return False
+        return False, 'Некорректный тип файла!'
     extension = file.filename.split('.')[-1]
     if not is_valid_extension(extension):
-        return False
+        return False, 'Некорректный тип файла!'
     conn, cursor = settings.connect_to_db()
     try:
         query = 'SELECT COUNT(*) FROM posts'
@@ -40,5 +40,5 @@ def upload_file(file, info_post: dict) -> bool:
     except Exception as err:
         print(f'[-] {err}')
         cursor.close()
-        return False
-    return True
+        return False, 'Что-то пошло не так...'
+    return True, 'Успешная загрузка поста!'
