@@ -4,11 +4,13 @@ from utils import *
 
 @app.route("/favicon.ico")
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.errorhandler(HTTPException)
 def not_found(error):
+    print(f'[-] {error}')
     return redirect('/'), 302
 
 
@@ -20,8 +22,8 @@ def index():
         context_login = True
     context_admin = validate_role(request.cookies.get('session'), 'admin')
     context_support = validate_role(request.cookies.get('session'), 'support')
-    context = {"login": context_login, "username": username, "admin": [context_admin, app.flag_auth],
-               'posts': get_posts(), "support": [context_support, app.flag_brute]}
+    context = {"login": context_login, "username": username, "admin": [context_admin, FLAG_AUTH],
+               'posts': get_posts(), "support": [context_support, FLAG_BRUTEHASH]}
     res = make_response(render_template("index.html", context=context))
     return res
 
@@ -36,7 +38,8 @@ def instruction():
     content = read_file(request.values.get('lang'))
     context = {"login": context_login, "username": username, "support": context_support, "content": content}
     context_admin = validate_role(request.cookies.get('session'), 'admin')
-    context["admin"] = [context_admin, app.flag_auth]
+    context["admin"] = [context_admin, FLAG_AUTH]
+    context["path_to_file"] = f"/tmp/{PT_FILE}"
     return make_response(render_template("instruction.html", context=context))
 
 
@@ -47,7 +50,7 @@ def status():
     context_admin = validate_role(request.cookies.get('session'), 'admin')
     if username:
         context_login = True
-    context = {"login": context_login, "username": username, "admin": [context_admin, app.flag_auth]}
+    context = {"login": context_login, "username": username, "admin": [context_admin, FLAG_AUTH]}
     if request.method == "GET":
         return make_response(render_template("status.html", context=context))
     else:
@@ -77,9 +80,11 @@ def search():
     data = request.form
     if 'filter' not in data:
         return redirect("/")
-    posts = search_posts(request.form.get('filter'), request.form.get('search'))
-    context = {"login": context_login, "username": username, "admin": [context_admin, app.flag_auth],
-               'posts': posts, "support": context_support}
+    posts, msg = search_posts(request.form.get('filter'), request.form.get('search'))
+    if msg:
+        pass
+    context = {"login": context_login, "username": username, "admin": [context_admin, FLAG_AUTH],
+               'posts': posts, "support": context_support, "msg": msg}
     return make_response(render_template("index.html", context=context))
 
 
@@ -92,7 +97,7 @@ def post(post_id):
         context_login = True
         context["username"] = username
     context_admin = validate_role(request.cookies.get('session'), 'admin')
-    context["admin"] = [context_admin, app.flag_auth]
+    context["admin"] = [context_admin, FLAG_AUTH]
     context["login"] = context_login
     context["post_id"] = post_id
     comments = get_comments_from_post(post_id)
@@ -116,7 +121,7 @@ def new_post():
     if username:
         context_login = True
     context_admin = validate_role(request.cookies.get('session'), 'admin')
-    context = {"login": context_login, "username": username, "admin": [context_admin, app.flag_auth]}
+    context = {"login": context_login, "username": username, "admin": [context_admin, FLAG_AUTH], "msg": ""}
     if request.method == "GET":
         return make_response(render_template("add_post.html", context=context))
     else:
@@ -124,7 +129,8 @@ def new_post():
             return make_response(render_template("add_post.html", context=context))
         info_post = request.form.to_dict()
         info_post['username'] = username
-        upload_file(request.files['file'], info_post)
+        is_ok, msg = upload_file(request.files['file'], info_post)
+        context['msg'] = msg
         return make_response(render_template("add_post.html", context=context))
 
 
@@ -133,7 +139,7 @@ def login():
     msg = ''
     context = {}
     context_admin = validate_role(request.cookies.get('session'), 'admin')
-    context["admin"] = [context_admin, app.flag_auth]
+    context["admin"] = [context_admin, FLAG_AUTH]
     if request.method == "GET":
         if validate_session(request.cookies.get('session')):
             return make_response(redirect('/'))
@@ -141,17 +147,17 @@ def login():
         return make_response(render_template("login.html", context=context))
     else:
         time.sleep(1.5)
-        is_ok, new_session = validate_login(request.form.get('login'), request.form.get('password'))
+        is_ok, new_session, msg = validate_login(request.form.get('login'), request.form.get('password'))
         if is_ok:
             res = make_response(redirect('/'))
             res.set_cookie("session", new_session, httponly=True, samesite="Strict")
+            res.set_cookie("BotCookie", "I'm not the bot!", httponly=False, samesite="Strict")
             payload = jwt.decode(new_session, SECRET_KEY, algorithms="HS256")
             res.set_cookie("refresh_token", payload['refresh_token'], httponly=False, samesite="Strict")
             res.set_cookie("expired", str(payload['expired']), httponly=False, samesite="Strict")
             res.set_cookie("user_id", str(payload['user_id']), httponly=False, samesite="Strict")
             return res
         else:
-            msg = 'Неверный логин/пароль'
             context['msg'] = msg
             return make_response(render_template("login.html", context=context))
 
@@ -191,7 +197,7 @@ def refresh():
 def register():
     context = {'msg': None}
     context_admin = validate_role(request.cookies.get('session'), 'admin')
-    context["admin"] = [context_admin, app.flag_auth]
+    context["admin"] = [context_admin, FLAG_AUTH]
     if request.method == "GET":
         if validate_session(request.cookies.get('session')):
             return redirect('/')

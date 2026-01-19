@@ -5,8 +5,8 @@
   <div class="filter-search">
     <form class="search-form" method="post" action="/search">
       <select class="filter" name="filter">
-        <option value="" selected disabled hidden>Фильтр</option>
-        <option value="title">В названии</option>
+        <option value="" disabled hidden>Фильтр</option>
+        <option value="title" selected>В названии</option>
         <option value="tags">По категории</option>
         <option value="username">По пользователю</option>
       </select>
@@ -20,6 +20,11 @@
     {% endif %}
     {% if context.support.0 %}
     <span class="main post" style="text-align: center"><b>{{ context.support.1 }}</b></span>
+    {% endif %}
+    {% if context.msg %}
+    <div class="main post">
+      <span style="text-align: center"><b>{{ context.msg }}</b></span>
+    </div>
     {% endif %}
     {% for post in context.posts %}
     {% if post.visible != 0 %}
