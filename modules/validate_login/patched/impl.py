@@ -10,7 +10,7 @@ def validate_login(login: str, password: str) -> tuple:
         return 0, None, 'Некорректный логин пользователя'
     conn, cursor = settings.connect_to_db()
     query = f'SELECT id FROM users WHERE password=? and username=?'
-    result = cursor.execute(query, (login.lower(), settings.hashlib.md5(password.encode()).hexdigest(), )).fetchone()
+    result = cursor.execute(query, (settings.hashlib.md5(password.encode()).hexdigest(), login.lower(), )).fetchone()
     if result:
         payload = generate_token(result[0], login)
         new_session = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
