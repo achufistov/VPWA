@@ -42,7 +42,7 @@
 </details>
 
 ## Installation
-> 1. git clone git@github.com:humwer/VPWA.git
+> 1. git clone git@github.com:aexord/VPWA.git
 > 2. Настройка файла profile.yaml (указать необходимые модули)
 > 3. docker-compose build
 > 4. docker-compose up
