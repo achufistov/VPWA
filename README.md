@@ -5,5 +5,6 @@
 
 ## Installation
 > 1. git clone https://github.com/achufistov/VPWA.git
-> 2. docker-compose build
-> 3. docker-compose up
+> 2. cd VPWA
+> 3. docker-compose build
+> 4. docker-compose up
