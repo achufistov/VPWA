@@ -8,6 +8,7 @@
 > 2. cd VPWA
 > 3. docker-compose build
 > 4. docker-compose up
+> 5. Приложение будет доступно по адресу localhost:3001
 
 > 
-> Этот проект теперь поддерживает сборку на `amd64` и `arm64` (Apple Silicon) при использовании официальных образов Docker.
+> Этот проект поддерживает сборку на `amd64` и `arm64` (Apple Silicon) при использовании Docker.
