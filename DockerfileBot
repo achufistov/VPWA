@@ -1,7 +1,34 @@
-FROM wernight/phantomjs
-USER root
+FROM node:20-bullseye-slim
+
+WORKDIR /bot
 COPY xss-bot.js /bot/
 COPY run_bot.sh /bot/
-WORKDIR /bot
-RUN chmod +x run_bot.sh
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        fonts-liberation \
+        libappindicator3-1 \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libcups2 \
+        libdbus-1-3 \
+        libdrm2 \
+        libgtk-3-0 \
+        libnspr4 \
+        libnss3 \
+        libx11-xcb1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxrandr2 \
+        libxkbcommon0 \
+        libgbm1 \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libxss1 \
+        libxtst6 \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install --no-save puppeteer \
+    && chmod +x ./run_bot.sh
+
 CMD ["sh", "-c", "./run_bot.sh"]

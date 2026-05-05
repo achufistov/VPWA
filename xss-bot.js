@@ -1,34 +1,44 @@
-var page = require('webpage').create();
-var system = require('system');
-var host = system.args[1];
-var post_num = system.args[2];
-var url = "http://"+host+":6177/posts/"+post_num;
-var timeout = 5000;
-var seconds = 5000;
+const puppeteer = require('puppeteer');
 
-phantom.addCookie({
-    'name': 'BotCookie',
-    'value': 'FLAG{0op$_c00k13_w17h0u7_h77p_0n1y?}',
-    'domain': host,
-    'path': '/',
-    'httponly': false
-});
+const host = process.argv[2];
+const postNum = process.argv[3];
+const url = `http://${host}:6177/posts/${postNum}`;
+const timeout = 5000;
+const waitMs = 5000;
 
-page.onNavigationRequested = function(url, type, willNavigate, main) {
-    console.log("[URL] URL="+url);
-};
+(async () => {
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: true,
+  });
 
-page.settings.resourceTimeout = timeout;
-page.onResourceTimeout = function(e) {
-    setTimeout(function(){
-        console.log("[INFO] Timeout")
-        phantom.exit();
-    }, seconds);
-};
+  const page = await browser.newPage();
 
-page.open(url, function(status) {
-    console.log("[INFO] rendered page");
-    setTimeout(function(){
-        phantom.exit();
-    }, seconds);
-});
+  page.on('request', request => {
+    if (request.isNavigationRequest()) {
+      console.log(`[URL] URL=${request.url()}`);
+    }
+  });
+
+  await page.setCookie({
+    name: 'BotCookie',
+    value: 'FLAG{0op$_c00k13_w17h0u7_h77p_0n1y?}',
+    domain: host,
+    path: '/',
+    httpOnly: false,
+    secure: false,
+  });
+
+  try {
+    const response = await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout,
+    });
+    console.log('[INFO] rendered page', response ? `status ${response.status()}` : 'no response');
+  } catch (error) {
+    console.log('[INFO] Timeout or navigation error', error.message);
+  }
+
+  await new Promise(resolve => setTimeout(resolve, waitMs));
+  await browser.close();
+})();

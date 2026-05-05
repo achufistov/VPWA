@@ -8,3 +8,6 @@
 > 2. cd VPWA
 > 3. docker-compose build
 > 4. docker-compose up
+
+> 
+> Этот проект теперь поддерживает сборку на `amd64` и `arm64` (Apple Silicon) при использовании официальных образов Docker.
