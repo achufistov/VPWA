@@ -146,7 +146,7 @@ def prepare_db():
                f'INSERT INTO "posts" ("id", "username", "title", "tags", "content_path", "visible") '
                f'VALUES (4, "C00lB0y", "Хацкеры такие хацкеры", "Image,Humor", "/static/content_4.jpg", 1);',
                f'INSERT INTO "posts" ("id", "username", "title", "tags", "content_path", "visible") '
-               f'VALUES (5, "C00lB0y", "Решил CTF от Пенитрагона", "Image,CTF,Penitragon", "/static/content_5.png", 1);',
+               f'VALUES (5, "C00lB0y", "Решил CTF", "Image,CTF", "/static/content_5.png", 1);',
     ]
 
     data = multiple_queries_to_db(queries, cursor, conn)

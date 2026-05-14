@@ -27,6 +27,7 @@ RUN apt-get update \
         libpangocairo-1.0-0 \
         libxss1 \
         libxtst6 \
+        chromium \
     && rm -rf /var/lib/apt/lists/* \
     && npm install --no-save puppeteer \
     && chmod +x ./run_bot.sh
